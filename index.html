@@ -51,9 +51,11 @@ function animate() {
 </script>
 <script src="https://raw.githubusercontent.com/karpathy/tsnejs/master/tsne.js"></script>
     <script>
+        console.log('Startng TSNE');
         tsnejs.initDataSet([9, 3, 4, 5], [7, 8 ,4 ,6]]);
         tsnejs.initSolution();
         for(var i = 0; i < 100; i++){
+            console.log('Step: ' + i);
             tsnejs.step();
         }
         console.log(tsnejs.getSolution());
