@@ -28,8 +28,40 @@ function init() {
     material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
 
     mesh = new THREE.Mesh( geometry, material );
-    scene.add( mesh );
+    //scene.add( mesh );
 
+    // create the particle variables
+    var particleCount = 1800,
+        particles = new THREE.Geometry(),
+        pMaterial = new THREE.ParticleBasicMaterial({
+          color: 0xFFFFFF,
+          size: 20
+    });
+
+    // now create the individual particles
+    for (var p = 0; p < particleCount; p++) {
+
+      // create a particle with random
+      // position values, -250 -> 250
+      var pX = Math.random() * 500 - 250,
+          pY = Math.random() * 500 - 250,
+          pZ = Math.random() * 500 - 250,
+          particle = new THREE.Vertex(
+            new THREE.Vector3(pX, pY, pZ)
+          );
+
+      // add it to the geometry
+      particles.vertices.push(particle);
+    }
+
+    // create the particle system
+    var particleSystem = new THREE.ParticleSystem(
+        particles,
+        pMaterial);
+
+    // add it to the scene
+    scene.addChild(particleSystem);
+    
     renderer = new THREE.WebGLRenderer();
     renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -51,14 +83,23 @@ function animate() {
 </script>
 <script src="https://raw.githubusercontent.com/karpathy/tsnejs/master/tsne.js"></script>
     <script>
-        console.log('Startng TSNE');
-        tsnejs.initDataSet([9, 3, 4, 5], [7, 8 ,4 ,6]]);
-        tsnejs.initSolution();
-        for(var i = 0; i < 100; i++){
-            console.log('Step: ' + i);
-            tsnejs.step();
+        var opt = {}
+        opt.epsilon = 10; // epsilon is learning rate (10 = default)
+        opt.perplexity = 30; // roughly how many neighbors each point influences (30 = default)
+        opt.dim = 3; // dimensionality of the embedding (2 = default)
+
+        var tsne = new tsnejs.tSNE(opt); // create a tSNE instance
+
+        // initialize data. Here we have 3 points and some example pairwise dissimilarities
+        var dists = [[1.0, 0.1, 0.2, 5.9], [0.1, 1.0, 0.3, 0.6], [0.2, 0.1, 1.0, 7.2]];
+        tsne.initDataDist(dists);
+
+        for(var k = 0; k < 500; k++) {
+          tsne.step(); // every time you call this, solution gets better
         }
-        console.log(tsnejs.getSolution());
+
+        var Y = tsne.getSolution(); // Y is an array of 2-D points that you can plot
+        console.log(Y);
     </script>
 
 </body>
